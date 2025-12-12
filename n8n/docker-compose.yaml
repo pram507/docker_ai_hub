@@ -1,116 +1,74 @@
-volumes:
-  n8n_data:
-  postgres_storage:
-  shared:
-
-x-n8n: &service-n8n
-  image: n8nio/n8n:latest
-  extra_hosts:
-    - "host.docker.internal:host-gateway"
-  environment:
-    - DB_TYPE=postgresdb
-    - DB_POSTGRESDB_HOST=host.docker.internal
-    - DB_POSTGRESDB_PORT=${POSTGRES_PORT}
-    - DB_POSTGRESDB_SCHEMA=${POSTGRESDB_SCHEMA}
-    - DB_POSTGRESDB_DATABASE=${POSTGRES_DB}
-    - DB_POSTGRESDB_USER=${POSTGRES_NON_ROOT_USER}
-    - DB_POSTGRESDB_PASSWORD=${POSTGRES_NON_ROOT_PASSWORD}
-    - N8N_RUNNERS_ENABLED=true
-    - N8N_RUNNERS_MODE=external
-    - N8N_LOG_LEVEL=debug
-    - N8N_RUNNERS_AUTH_TOKEN=your-secret-here
-    - N8N_NATIVE_PYTHON_RUNNER=true
-    - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
-    - N8N_RUNNERS_BROKER_LISTEN_ADDRESS=0.0.0.0
-    - N8N_DIAGNOSTICS_ENABLED=false
-    - N8N_PERSONALIZATION_ENABLED=false
-    - N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=
-    - N8N_RUNNERS_MAX_CONCURRENCY=10
-    - N8N_SECURE_COOKIE=false
-    - N8N_ENCRYPTION_KEY
-    - N8N_HOST=10.52.144.148
-    - N8N_PORT=5678
-    - N8N_ENABLED_MODULES=data-table
-    - GENERIC_TIMEZONE="Asia/Jakarta"
-    - TZ="Asia/Jakarta"
-    - N8N_USER_MANAGEMENT_JWT_SECRET
-  # env_file:
-  #   - path: .env
-  #     required: true
-
 services:
-  postgres:
-    image: postgres:17
-    container_name: postgres_17
-    # hostname: postgres
-    restart: always
-    environment:
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_DB
-      - POSTGRES_NON_ROOT_USER
-      - POSTGRES_NON_ROOT_PASSWORD
-    # networks:
-    #   - demo
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    ports:
-      - "5432:5432"
-    volumes:
-      - ./postgres_storage:/var/lib/postgresql/data
-      - ./init-data.sh:/docker-entrypoint-initdb.d/init-data.sh
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
-      interval: 5s
-      timeout: 5s
-      retries: 10
+  # traefik:
+  #   image: "traefik"
+  #   restart: always
+  #   command:
+  #     - "--api.insecure=true"
+  #     - "--providers.docker=true"
+  #     - "--providers.docker.exposedbydefault=false"
+  #     - "--entrypoints.web.address=:80"
+  #     - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+  #     - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+  #     - "--entrypoints.websecure.address=:443"
+  #     - "--certificatesresolvers.mytlschallenge.acme.tlschallenge=true"
+  #     - "--certificatesresolvers.mytlschallenge.acme.email=${SSL_EMAIL}"
+  #     - "--certificatesresolvers.mytlschallenge.acme.storage=/letsencrypt/acme.json"
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - traefik_data:/letsencrypt
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
 
   n8n:
-    <<: *service-n8n
-    hostname: n8n
-    container_name: n8n
-    restart: unless-stopped
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    image: docker.n8n.io/n8nio/n8n
+    restart: always
     ports:
-      - 5678:5678
+      - "127.0.0.1:5678:5678"
+    # labels:
+      # - traefik.enable=true
+      # - traefik.http.routers.n8n.rule=Host(`${SUBDOMAIN}.${DOMAIN_NAME}`)
+      # - traefik.http.routers.n8n.tls=true
+      # - traefik.http.routers.n8n.entrypoints=web,websecure
+      # - traefik.http.routers.n8n.tls.certresolver=mytlschallenge
+      # - traefik.http.middlewares.n8n.headers.SSLRedirect=true
+      # - traefik.http.middlewares.n8n.headers.STSSeconds=315360000
+      # - traefik.http.middlewares.n8n.headers.browserXSSFilter=true
+      # - traefik.http.middlewares.n8n.headers.contentTypeNosniff=true
+      # - traefik.http.middlewares.n8n.headers.forceSTSHeader=true
+      # - traefik.http.middlewares.n8n.headers.SSLHost=${DOMAIN_NAME}
+      # - traefik.http.middlewares.n8n.headers.STSIncludeSubdomains=true
+      # - traefik.http.middlewares.n8n.headers.STSPreload=true
+      # - traefik.http.routers.n8n.middlewares=n8n@docker
+    environment:
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=True
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      # - N8N_RUNNERS_ENABLED=False
+      - NODE_ENV=production
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+      - N8N_SKIP_SSL_VERIFICATION=True
+      - DEPTH_ZERO_SELF_SIGNED_CERT=True
+      # - N8N_GIT_NODE_DISABLE_BARE_REPOS=true
+      # - N8N_RATE_LIMIT_ENABLED=false
+      - N8N_LOG_LEVEL=debug
+      # - N8N_TRUST_PROXY=false
+      - N8N_SECURE_COOKIE=False
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=False
+      - N8N_GIT_NODE_DISABLE_BARE_REPOS=True
+      - DB_SQLITE_POOL_SIZE=100
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
+      - TZ=${GENERIC_TIMEZONE}
+      # - N8N_RUNNERS_MODE=external
+      # - N8N_HOST=${SUBDOMAIN}.${DOMAIN_NAME}
+      # - WEBHOOK_URL=http://${SUBDOMAIN}.${DOMAIN_NAME}/
     volumes:
       - n8n_data:/home/node/.n8n
-      - ./n8n/demo-data:/demo-data
-      - shared:/data/shared
-    depends_on:
-      postgres:
-        condition: service_healthy
-      n8n-import:
-        condition: service_completed_successfully
-
-  task-runners:
-    <<: *service-n8n
-    image: n8nio/runners:latest
-    container_name: n8n-runners
+      - ./local-files:/files
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    environment:
-      - N8N_RUNNERS_TASK_BROKER_URI=http://host.docker.internal:5679
-      - N8N_RUNNERS_AUTH_TOKEN=your-secret-here
-      - N8N_RUNNERS_LAUNCHER_LOG_LEVEL=debug
-      - N8N_RUNNERS_AUTO_SHUTDOWN_TIMEOUT=15
-      - N8N_RUNNERS_MAX_CONCURRENCY=10
-    depends_on:
-      - n8n
+      
 
-  n8n-import:
-    <<: *service-n8n
-    hostname: n8n-import
-    container_name: n8n-import
-    entrypoint: /bin/sh
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    # command:
-    #   - "-c"
-    #   - "n8n import:credentials --separate --input=/demo-data/credentials && n8n import:workflow --separate --input=/demo-data/workflows"
-    volumes:
-      - ./n8n/demo-data:/demo-data
-    depends_on:
-      postgres:
-        condition: service_healthy
+volumes:
+  n8n_data:
+  # traefik_data:

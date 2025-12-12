@@ -1,0 +1,722 @@
+{
+  "name": "RAG Sample Qdrant",
+  "nodes": [
+    {
+      "parameters": {
+        "model": "ollama/bge-m3",
+        "options": {}
+      },
+      "id": "de3eddd5-a5ff-4655-87c4-b6c31ba96ca6",
+      "name": "Embeddings OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        96,
+        -1008
+      ],
+      "typeVersion": 1.1,
+      "credentials": {
+        "openAiApi": {
+          "id": "9F7xkiIvctRMbfAG",
+          "name": "OpenAi liteLLM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "binaryMode": "specificField",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "file_id",
+                "value": "=1"
+              },
+              {
+                "name": "file_name",
+                "value": "=test"
+              }
+            ]
+          }
+        }
+      },
+      "id": "65f0f342-dfb0-47ec-9c5b-f4ddcc0dbfc9",
+      "name": "Default Data Loader1",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "position": [
+        240,
+        -1008
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "rag_gen_ai",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "0af04df3-3d14-4c97-a4df-57e9a6ee482e",
+      "name": "Qdrant Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "position": [
+        160,
+        -1248
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "qdrantApi": {
+          "id": "yggkMTUU8EaTfBcg",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chunkSize": 500,
+        "chunkOverlap": 50,
+        "options": {}
+      },
+      "id": "3b665a0e-c726-4ad4-a969-be2a8113ab45",
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "position": [
+        224,
+        -848
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "05601fb1-3d1f-475d-8b45-28cd58d4f43c",
+      "name": "Question and Answer Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainRetrievalQa",
+      "position": [
+        176,
+        -288
+      ],
+      "typeVersion": 1.5
+    },
+    {
+      "parameters": {
+        "topK": 5
+      },
+      "id": "59f858b6-d688-4a5e-aa9d-ded9c3899330",
+      "name": "Vector Store Retriever",
+      "type": "@n8n/n8n-nodes-langchain.retrieverVectorStore",
+      "position": [
+        144,
+        -96
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "rag_gen_ai",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "d33edaf0-81a4-4a6f-842c-34794e53f200",
+      "name": "Qdrant Vector Store1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "position": [
+        64,
+        80
+      ],
+      "typeVersion": 1.1,
+      "credentials": {
+        "qdrantApi": {
+          "id": "yggkMTUU8EaTfBcg",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "ollama/bge-m3",
+        "options": {}
+      },
+      "id": "ddb7c6b0-9e44-4349-805b-6d29a8603888",
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        64,
+        272
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "9F7xkiIvctRMbfAG",
+          "name": "OpenAi liteLLM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "ollama/bge-m3",
+        "options": {}
+      },
+      "id": "a422e787-f967-4dd3-963f-904ef9d9ae07",
+      "name": "Embeddings OpenAI4",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        112,
+        -416
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "9F7xkiIvctRMbfAG",
+          "name": "OpenAi liteLLM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "id": "d0911254-0337-47ea-b334-4807b0338912",
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        688,
+        -432
+      ],
+      "typeVersion": 3.1
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "document.metadata.file_id"
+            },
+            {
+              "fieldToAggregate": "document.metadata.file_name"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bea3293c-2753-4e77-b46b-6430eecdc66a",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "position": [
+        432,
+        -624
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "282b9bed-e5fd-4edb-95d5-682bcc08e070",
+              "name": "chatInput",
+              "type": "string",
+              "value": "={{ $json.chatInput ?? $json.body.chatInput }}"
+            },
+            {
+              "id": "893d6658-f4f1-47ed-bd79-34295f9b0f69",
+              "name": "isChat",
+              "value": "={{ $json.chatInput != null }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c758bef4-cf0a-48af-b076-0141bcc6a347",
+      "name": "chatInput",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -240,
+        -480
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "mode": "load",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "rag_gen_ai",
+          "mode": "id"
+        },
+        "prompt": "={{ $json.chatInput }}",
+        "topK": 5,
+        "options": {}
+      },
+      "id": "35befbc3-c053-4e38-b218-6d11dacd2ba9",
+      "name": "Retrive sources",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "position": [
+        112,
+        -624
+      ],
+      "typeVersion": 1.1,
+      "credentials": {
+        "qdrantApi": {
+          "id": "yggkMTUU8EaTfBcg",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b296c92b-d9ee-4322-b972-d1069d01feb8",
+              "name": "output",
+              "type": "string",
+              "value": "={{ $('Question and Answer Chain').item.json.response }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6dcf58b0-2fcc-4c51-a3a5-73e929b5c904",
+      "name": "Output",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        912,
+        -432
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "content": "## Complete RAG System with Automatic Source Citations Using Qdrant\n\nThis workflow implements a **Retrieval-Augmented Generation (RAG)** system that:\n\n* Stores vectorized documents in **Qdrant**,\n* Retrieves relevant content based on user input,\n* Generates AI answers using **Google Gemini**,\n* Automatically **cites the document sources** (from Google Drive).\n",
+        "height": 220,
+        "width": 840
+      },
+      "id": "7d19f484-9689-458b-a1a0-553f0aa17f3c",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1408,
+        -1264
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "# STEP 1\n\n## Create Qdrant Collection\nChange:\n- QDRANTURL\n- COLLECTION",
+        "height": 572,
+        "width": 1104,
+        "color": 6
+      },
+      "id": "590d059f-89fa-4933-9cd3-004cefd4b9b8",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -528,
+        -1264
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "formTitle": "Form RAG",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "data",
+              "fieldType": "file",
+              "acceptFileTypes": ".pdf",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -128,
+        -1248
+      ],
+      "id": "db491807-1792-42f2-8d85-92f9a3151d2f",
+      "name": "On form submission",
+      "webhookId": "2dcf2e54-ebdd-440c-ab82-9b72b85026f0"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "Qwen2-7B-Instruct",
+          "mode": "list",
+          "cachedResultName": "Qwen2-7B-Instruct"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -16,
+        -96
+      ],
+      "id": "53a4ce4d-0324-4f23-b4b4-f77c03a432c2",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "9F7xkiIvctRMbfAG",
+          "name": "OpenAi liteLLM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -640,
+        -592
+      ],
+      "id": "c220342c-5ddb-49e0-b1e8-19994cee59a3",
+      "name": "When chat message received",
+      "webhookId": "f244ee1f-d7bb-40de-9a0c-7d455dba06b2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1456,
+        -256
+      ],
+      "id": "2a008289-6d9a-4a95-9cb5-f4dfb7a2d044",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('chatInput').item.json.isChat }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    },
+                    "id": "e19ba7fd-f0b7-47e3-8eeb-6ad2d062f49a"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "IsChat"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "33669168-e963-4057-878d-db99e5360e4f",
+                    "leftValue": "={{ $('chatInput').item.json.isChat }}",
+                    "rightValue": "false",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "false",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "webhook"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1152,
+        -432
+      ],
+      "id": "994e50e4-559d-4540-a9f6-dea24b85e215",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "9c85a56b-9126-4c78-854d-040713853c15",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -656,
+        -384
+      ],
+      "id": "334140db-3c92-4054-bf58-01dafe8c77e0",
+      "name": "Webhook",
+      "webhookId": "9c85a56b-9126-4c78-854d-040713853c15",
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader1",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Question and Answer Chain": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Vector Store Retriever": {
+      "ai_retriever": [
+        [
+          {
+            "node": "Question and Answer Chain",
+            "type": "ai_retriever",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store1": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Vector Store Retriever",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI4": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Retrive sources",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "chatInput": {
+      "main": [
+        [
+          {
+            "node": "Question and Answer Chain",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Retrive sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrive sources": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Question and Answer Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "chatInput",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Output": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "chatInput",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "chatInput",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2101a9b0-30c3-4137-9d5f-ba08d1ec71a0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d5ca9d6ed2897651c64ad894319bf5e6e4a971aae2c80cebc06ad50769c82520"
+  },
+  "id": "pJWOFZgzYBtKvBWR",
+  "tags": []
+}
