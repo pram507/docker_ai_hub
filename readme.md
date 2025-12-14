@@ -1,7 +1,7 @@
 # Starting point for learn AI Agent
 
-## models 1 - RAG
- Tool 
+## Models 1 - RAG Level 1
+ Tools for running demo use case :
  - DOCKER
  - N8N
  - OpenWebUI
