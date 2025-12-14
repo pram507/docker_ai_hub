@@ -1,4 +1,4 @@
-# Starting point for learn AI Agent
+# Starting point to learn AI Agent
 
 ## Models 1 - RAG Level 1
  Tools for running demo use case :
