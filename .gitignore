@@ -1,7 +1,5 @@
 .DS_Store
-qdrant_data
-/ai_hub-rag_1/qdrant/qdrant_data
-ai_hub-rag_1/qdrant/qdrant_data/*.*
 .dat
-/ai_hub-rag_1/qdrant/qdrant_data/collections
-.DS_Store
+ai_hub-rag_1/qdrant/qdrant_data
+ai_hub-rag_1/qdrant/qdrant_data/*.*
+ai_hub-rag_1/qdrant/qdrant_data/collections
