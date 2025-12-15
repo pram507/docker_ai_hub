@@ -1,9 +1,9 @@
 {
-  "name": "RAG Sample Qdrant",
+  "name": "RAG 1 - Qdrant",
   "nodes": [
     {
       "parameters": {
-        "model": "ollama/bge-m3",
+        "model": "bge-m3",
         "options": {}
       },
       "id": "de3eddd5-a5ff-4655-87c4-b6c31ba96ca6",
@@ -16,8 +16,8 @@
       "typeVersion": 1.1,
       "credentials": {
         "openAiApi": {
-          "id": "9F7xkiIvctRMbfAG",
-          "name": "OpenAi liteLLM"
+          "id": "Uzx5WFXbf1toTCuo",
+          "name": "Tsel AI Lab"
         }
       }
     },
@@ -30,11 +30,15 @@
             "metadataValues": [
               {
                 "name": "file_id",
-                "value": "=1"
+                "value": "={{ $json.file_id }}"
               },
               {
                 "name": "file_name",
-                "value": "=test"
+                "value": "={{ $json.data[0].filename }}"
+              },
+              {
+                "name": "file_size",
+                "value": "={{ $json.data[0].size }}"
               }
             ]
           }
@@ -54,7 +58,7 @@
         "mode": "insert",
         "qdrantCollection": {
           "__rl": true,
-          "value": "rag_gen_ai",
+          "value": "={{ $json.collection }}",
           "mode": "id"
         },
         "options": {}
@@ -76,7 +80,7 @@
     },
     {
       "parameters": {
-        "chunkSize": 500,
+        "chunkSize": 1024,
         "chunkOverlap": 50,
         "options": {}
       },
@@ -91,7 +95,9 @@
     },
     {
       "parameters": {
-        "options": {}
+        "options": {
+          "systemPromptTemplate": "You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question.\nIf you don't know the answer, just say that you don't know, don't try to make up an answer.\n----------------\nContext: {context}"
+        }
       },
       "id": "05601fb1-3d1f-475d-8b45-28cd58d4f43c",
       "name": "Question and Answer Chain",
@@ -119,7 +125,7 @@
       "parameters": {
         "qdrantCollection": {
           "__rl": true,
-          "value": "rag_gen_ai",
+          "value": "={{ $json.collections }}",
           "mode": "id"
         },
         "options": {}
@@ -141,7 +147,7 @@
     },
     {
       "parameters": {
-        "model": "ollama/bge-m3",
+        "model": "bge-m3",
         "options": {}
       },
       "id": "ddb7c6b0-9e44-4349-805b-6d29a8603888",
@@ -154,14 +160,14 @@
       "typeVersion": 1.2,
       "credentials": {
         "openAiApi": {
-          "id": "9F7xkiIvctRMbfAG",
-          "name": "OpenAi liteLLM"
+          "id": "Uzx5WFXbf1toTCuo",
+          "name": "Tsel AI Lab"
         }
       }
     },
     {
       "parameters": {
-        "model": "ollama/bge-m3",
+        "model": "bge-m3",
         "options": {}
       },
       "id": "a422e787-f967-4dd3-963f-904ef9d9ae07",
@@ -174,8 +180,8 @@
       "typeVersion": 1.2,
       "credentials": {
         "openAiApi": {
-          "id": "9F7xkiIvctRMbfAG",
-          "name": "OpenAi liteLLM"
+          "id": "Uzx5WFXbf1toTCuo",
+          "name": "Tsel AI Lab"
         }
       }
     },
@@ -232,6 +238,12 @@
               "name": "isChat",
               "value": "={{ $json.chatInput != null }}",
               "type": "boolean"
+            },
+            {
+              "id": "0c1e9ce2-9b7d-4a56-9b30-26dfaec3b65d",
+              "name": "collections",
+              "value": "rag_demo_13",
+              "type": "string"
             }
           ]
         },
@@ -241,8 +253,8 @@
       "name": "chatInput",
       "type": "n8n-nodes-base.set",
       "position": [
-        -240,
-        -480
+        -288,
+        -624
       ],
       "typeVersion": 3.4
     },
@@ -251,7 +263,7 @@
         "mode": "load",
         "qdrantCollection": {
           "__rl": true,
-          "value": "rag_gen_ai",
+          "value": "={{ $json.collections }}",
           "mode": "id"
         },
         "prompt": "={{ $json.chatInput }}",
@@ -298,7 +310,7 @@
     },
     {
       "parameters": {
-        "content": "## Complete RAG System with Automatic Source Citations Using Qdrant\n\nThis workflow implements a **Retrieval-Augmented Generation (RAG)** system that:\n\n* Stores vectorized documents in **Qdrant**,\n* Retrieves relevant content based on user input,\n* Generates AI answers using **Google Gemini**,\n* Automatically **cites the document sources** (from Google Drive).\n",
+        "content": "## Complete RAG System with Automatic Source Using Qdrant\n\nThis workflow implements a **Retrieval-Augmented Generation (RAG)** system that:\n\n* Stores vectorized documents in **Qdrant**,\n* Retrieves relevant content based on user input,\n* Generates AI answers using **Telkomsel AI Labs API**,\n",
         "height": 220,
         "width": 840
       },
@@ -337,6 +349,17 @@
               "fieldType": "file",
               "acceptFileTypes": ".pdf",
               "requiredField": true
+            },
+            {
+              "fieldLabel": "collection",
+              "placeholder": "name of collection source",
+              "defaultValue": "rag_demo_1"
+            },
+            {
+              "fieldLabel": "file_id",
+              "placeholder": "File ID fo collection store",
+              "defaultValue": "1",
+              "requiredField": true
             }
           ]
         },
@@ -345,7 +368,7 @@
       "type": "n8n-nodes-base.formTrigger",
       "typeVersion": 2.3,
       "position": [
-        -128,
+        -96,
         -1248
       ],
       "id": "db491807-1792-42f2-8d85-92f9a3151d2f",
@@ -356,9 +379,9 @@
       "parameters": {
         "model": {
           "__rl": true,
-          "value": "Qwen2-7B-Instruct",
+          "value": "telkomsel-ai-labs",
           "mode": "list",
-          "cachedResultName": "Qwen2-7B-Instruct"
+          "cachedResultName": "telkomsel-ai-labs"
         },
         "options": {}
       },
@@ -372,8 +395,8 @@
       "name": "OpenAI Chat Model1",
       "credentials": {
         "openAiApi": {
-          "id": "9F7xkiIvctRMbfAG",
-          "name": "OpenAi liteLLM"
+          "id": "Uzx5WFXbf1toTCuo",
+          "name": "Tsel AI Lab"
         }
       }
     },
@@ -384,8 +407,8 @@
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.4,
       "position": [
-        -640,
-        -592
+        -848,
+        -624
       ],
       "id": "c220342c-5ddb-49e0-b1e8-19994cee59a3",
       "name": "When chat message received",
@@ -480,7 +503,7 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -656,
+        -848,
         -384
       ],
       "id": "334140db-3c92-4054-bf58-01dafe8c77e0",
@@ -712,7 +735,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "2101a9b0-30c3-4137-9d5f-ba08d1ec71a0",
+  "versionId": "42bc1b87-1aa2-432c-98ea-78770e4acf24",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "d5ca9d6ed2897651c64ad894319bf5e6e4a971aae2c80cebc06ad50769c82520"
