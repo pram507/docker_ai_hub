@@ -10,6 +10,9 @@ services:
       - 6333
       - 6334
       - 6335
+    environment:
+      - QDRANT__SERVICE__MAX_REQUEST_SIZE_MB=100 
+      - QDRANT__LOG_LEVEL=INFO
     configs:
       - source: qdrant_config
         target: /qdrant/config/production.yaml
