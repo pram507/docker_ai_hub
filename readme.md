@@ -9,5 +9,3 @@
  - Tsel AI Hub API ( LLM )
 
 
- user login : aihub@telkomsel.com
- password : Password@123
