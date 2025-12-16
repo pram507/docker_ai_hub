@@ -35,6 +35,7 @@ services:
       - ENABLE_API_KEYS=True
       - VECTOR_DB=qdrant
       - QDRANT_URI=http:localhost:6333
+      - HF_HUB_OFFLINE=1
       # - CORS_ALLOW_ORIGIN="*"
       # - ENABLE_LDAP=False
       - API_KEYS_ALLOWED_ENDPOINTS=True
